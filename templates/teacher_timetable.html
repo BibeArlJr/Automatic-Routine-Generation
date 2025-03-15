@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ teacher_name }}'s Routine</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        .container {
+            max-width: 100%;
+            padding: 20px;
+        }
+        .teacher-info {
+            background-color: lightblue;
+            text-align: center;
+            padding: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .table {
+            width: 100%;
+            text-align: center;
+            border-collapse: collapse;
+        }
+        .theory-session {
+            background-color: #5bc0de;
+            color: white;
+            font-weight: bold;
+        }
+        .lab-session {
+            background-color: yellow;
+            color: black;
+            font-weight: bold;
+        }
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="routine-content">
+        <div class="teacher-info">
+            {{ teacher_name }}'s Routine
+        </div>
+
+        <div class="btn-container">
+            <a href="{{ url_for('teacher_routine') }}" class="btn btn-primary">Back to Teacher List</a>
+            <button id="downloadBtn" class="btn btn-success">Download as PDF</button>
+        </div>
+
+        <table class="table table-bordered" id="routine-table">
+            <thead>
+                <tr>
+                    <th>Day</th>
+                    {% for slot in periods %}
+                        <th>{{ slot }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for day_schedule in timetable %}
+                    <tr>
+                        <td><strong>{{ day_schedule["Day"] }}</strong></td>
+                        {% for slot in day_schedule["Slots"] %}
+                            <td class="{% if slot.Subject %}
+                                          {% if slot.Type == 'Theory' %} theory-session
+                                          {% elif slot.Type == 'Practical' %} lab-session
+                                          {% endif %}
+                                      {% endif %}">
+                                {% if slot.Subject %}
+                                    <b>{{ slot.Subject }}</b><br>
+                                    ({{ slot.Semester }} - {{ slot.Faculty }})<br>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.getElementById("downloadBtn").addEventListener("click", function () {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                orientation: "landscape",
+                unit: "px",
+                format: "a4"
+            });
+
+            // Ensure the whole table is fully rendered before capturing
+            setTimeout(() => {
+                html2canvas(document.getElementById("routine-content"), {
+                    scale: 2,
+                    useCORS: true
+                }).then(canvas => {
+                    const imgData = canvas.toDataURL("image/png");
+                    const imgWidth = doc.internal.pageSize.getWidth() - 40;
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                    if (imgHeight > doc.internal.pageSize.getHeight() - 50) {
+                        doc.internal.pageSize.height = imgHeight + 50;
+                    }
+
+                    doc.addImage(imgData, "PNG", 20, 40, imgWidth, imgHeight);
+                    doc.save(`Routine_${{ teacher_name }}.pdf`);
+                });
+            }, 1000); // ✅ Small delay ensures full rendering
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='sidebar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='manage_user.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+   <style>
+    .flash-messages {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+    gap: 0.5rem;
+}
+
+.flash-message {
+    max-width: 90%;
+    width: 600px;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1rem;
+    text-align: center;
+}
+
+
+        /* Main Content */
+        .container {
+            margin-left: 190px;
+            padding: 20px;
+            width: calc(100% - 200px);
+            transition: margin-left 0.3s ease;
+        }
+
+   </style>
+   <script>
+        function confirmDelete(userId) {
+            if (confirm("Are you sure you want to delete this user?")) {
+                window.location.href = "{{ url_for('delete_user', user_id='') }}" + userId;
+            }
+        }
+
+         // AJAX call for filtering by faculty
+         function filterByFaculty() {
+            const faculty = document.getElementById('facultyFilter').value;
+
+            fetch('/filter_by_faculty', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ faculty })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const userTableBody = document.querySelector('.user-table tbody');
+                userTableBody.innerHTML = '';
+
+                data.teachers.forEach(user => {
+                    userTableBody.innerHTML += `
+                        <tr>
+                            <td>${user.full_name || 'N/A'}</td>
+                            <td>${user.contact_number || 'N/A'}</td>
+                            <td>${user.email || 'N/A'}</td>
+                            <td>${user.username || 'N/A'}</td>
+                            <td>${user.gender || 'N/A'}</td>
+                            <td>${user.role || 'N/A'}</td>
+                            <td>Teacher: ${user.teacher_type || 'FULL'} | Faculty: ${user.faculty || 'N/A'}</td>
+                            <td class="actions">
+                                <a href="/edit_user/${user._id}" class="btn edit">Edit</a>
+                                <button onclick="confirmDelete('${user._id}')" class="btn delete">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</head>
+<body>
+
+         <!-- Sidebar Include -->
+         {% include 'sidebar.html' %}
+
+    <div class="container">
+        <h1>User Management</h1>
+        {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+            <div class="flash-messages mt-3">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} flash-message">
+                        <span class="message-text">{{ message }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}  
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search Users..." />
+        <button id="searchButton">Search</button>
+    </div>  
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>SN</th>
+                    <th>Full Name</th>
+                    <th>Contact Number</th>
+                    <th>Email</th>
+                    <th>Username</th>
+                    <th>Gender</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ user.full_name }}</td>
+                    <td>{{ user.contact_number }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.gender }}</td>
+                    <td>
+                        {% if user.role == 'HOD' or user.role == 'DHOD' %}
+                            {{ user.role }} ({{ user.faculty }})
+                        {% else %}
+                            {{ user.role }}
+                        {% endif %}
+                    </td>
+                    <td class="actions">
+                        <a href="{{ url_for('edit_user', user_id=user._id) }}" class="btn edit">Edit</a>
+                        <button onclick="confirmDelete('{{ user._id }}')" class="btn delete">Delete</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+         // Function to filter user rows based on search input
+    function searchUsers() {
+        const input = document.getElementById('searchInput').value.toLowerCase();
+        const tableRows = document.querySelectorAll('.user-table tbody tr');
+
+        tableRows.forEach(row => {
+            // Get all text content in each row and convert to lowercase
+            const rowText = row.textContent.toLowerCase();
+
+            // Show row if it includes the search input value, otherwise hide it
+            if (rowText.includes(input)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    // Event listener for search input field
+    document.getElementById('searchInput').addEventListener('input', searchUsers);
+
+    // Optional: Add event listener for search button
+    document.getElementById('searchButton').addEventListener('click', searchUsers);
+
+             // Auto-hide flash messages after 5 seconds
+    setTimeout(() => {
+        const flashMessages = document.querySelectorAll('.flash-message');
+        flashMessages.forEach(message => {
+            message.style.display = 'none';
+        });
+    }, 5000);
+    </script>
+</body>
+</html>

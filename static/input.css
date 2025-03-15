@@ -1,0 +1,195 @@
+/* Importing Google Fonts - Poppins */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+body {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  padding-bottom: 0%;
+  background: linear-gradient(135deg, #71b7e6, #9b59b6);
+}
+
+.container {
+  max-width: 700px;
+  margin-top: 30px;
+  width: 100%;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  height: 90vh;
+  overflow: hidden;
+}
+
+.container .title {
+  font-size: 25px;
+  font-weight: 500;
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 10px;
+  padding-bottom: 20px;
+}
+
+.content::-webkit-scrollbar {
+  width: 5px;
+}
+
+.content::-webkit-scrollbar-thumb {
+  background: #9b59b6;
+  border-radius: 10px;
+}
+
+.user-details {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.user-details .input-box {
+  margin-bottom: 15px;
+  width: calc(50% - 20px);
+  /* Two columns */
+}
+
+.user-details .input-box button {
+  justify-content: space-between;
+  margin-left: 10px;
+  /* Space between dropdown and button */
+  height: 40px;
+  /* Ensure button height matches the dropdown */
+}
+
+.user-details .input-box input,
+.user-details .input-box select {
+  height: 40px;
+  width: 100%;
+  outline: none;
+  font-size: 16px;
+  border-radius: 5px;
+  padding-left: 15px;
+  border: 1px solid #ccc;
+  border-bottom-width: 2px;
+  transition: all 0.3s ease;
+}
+
+/* Adjust the label to match other labels in the form */
+.user-details .input-box .details {
+  font-size: 16px;
+  /* Match font size with other labels */
+  margin-bottom: 10px;
+  /* Add space between the label and dropdown */
+}
+
+/* This wrapper will make sure dropdown and button are in the same row */
+.user-details .input-box .dropdown-wrapper {
+  display: flex;
+  align-items: center; /* Vertically align button with dropdown */
+  gap: 15px; /* Space between dropdown and button */
+  margin-bottom: 10px; /* Optional: space between rows */
+}
+
+.user-details .input-box input:focus,
+.user-details .input-box select:focus {
+  border-color: #9b59b6;
+}
+
+.selected-course {
+  background-color: #f0f0f0;
+  border-radius: 5px;
+  padding: 4px;
+  margin-top: px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.selected-course button {
+  margin-left: 10px;
+  padding: 5px 10px;
+}
+
+.remove-course-btn {
+  background-color: #dc3545;
+  /* Red background */
+  color: white;
+  /* White text */
+  font-size: 12px;
+  /* Smaller text size */
+  padding: 5px 10px;
+  /* Padding */
+  border-radius: 3px;
+  /* Rounded corners */
+  border: none;
+  /* Remove border */
+  cursor: pointer;
+  /* Pointer cursor on hover */
+}
+
+.remove-course-btn:hover {
+  background-color: #c82333;
+  /* Darker red on hover */
+}
+
+.button {
+  height: 45px;
+  margin-bottom: 50px;
+}
+
+.button button {
+  width: 100%;
+  height: 100%;
+  border-radius: 5px;
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  background: linear-gradient(135deg, #71b7e6, #9b59b6);
+  transition: all 0.3s ease;
+}
+
+.button button:hover {
+  background: linear-gradient(-135deg, #71b7e6, #9b59b6);
+}
+
+@media (max-width: 584px) {
+  .user-details .input-box {
+    width: 100%;
+  }
+}
+
+.holiday-label {
+  font-size: 16px;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.holiday-dropdown,
+.elective-dropdown {
+  margin-bottom: 15px;
+  padding: 8px;
+  font-size: 14px;
+}
+
+.elective-container {
+  margin-bottom: 15px;
+}
+
+.btn-primary {
+  margin-top: 10px;
+}

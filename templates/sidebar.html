@@ -1,0 +1,29 @@
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <div class="profile">
+        <h3>{{ user.username }}</h3>  <!-- Display the actual username -->
+        <p>{{ user_role }}</p>         <!-- Display the user role -->
+        {% if user_role != 'Admin' %}
+        <p>{{ faculty_name }}</p>
+        {% endif %} 
+    </div>        
+
+    <ul>
+        {% if user_role == 'Admin' %}
+        <li><a href="{{ url_for('dashboard_admin') }}"><i class="fas fa-dashboard"></i> Dashboard</a></li>
+        {% else %}
+        <li><a href="{{ url_for('dashboard_hod') }}"><i class="fas fa-dashboard"></i> Dashboard</a></li>
+        {% endif %} 
+        {% if user_role == 'Admin' %}
+        <li><a href="{{ url_for('manage_users') }}"><i class="fas fa-users"></i> Manage Users</a></li>
+        {% endif %}
+        <li><a href="{{ url_for('manage_teachers') }}"><i class="fas fa-chalkboard-teacher"></i> Manage Teachers</a></li>
+        <li><a href="{{ url_for('manage_subjects') }}"><i class="fas fa-book"></i> Manage Subjects</a></li>
+        <li><a href="{{ url_for('manage_routines') }}"><i class="fas fa-calendar-alt"></i> View Routines</a></li>
+        <li><a href="{{ url_for('teacher_routine') }}"><i class="fas fa-user-clock"></i> Teacher Routines</a></li> <!-- ✅ NEW LINK -->
+    </ul>
+
+    <div class="logout" onclick="window.location.href='/logout'">
+        <i class="fas fa-sign-out-alt"></i> Logout
+    </div>
+</div>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generated Timetable</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      overflow-x: hidden; /* Prevent horizontal scrolling */
+    }
+    .container {
+      width: 100%; /* Make it span full width */
+      max-width: none;
+      padding: 4px;
+      margin: 0;
+      background: white;
+    }
+    .info-container {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+    .alert-info {
+      display: block;
+      width: 100%; /* Ensure it matches the table width */
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      padding: 5px;
+      box-sizing: border-box;
+      margin: 0; /* Remove any extra margin */
+    }
+    .table-container {
+      width: 100%;
+      padding: 0;
+    }
+    .table {
+      width: 100%;
+      table-layout: fixed; /* Distributes column widths evenly */
+      border-spacing: 0px 10px;
+      border-collapse: separate;
+    }
+    .table tbody tr {
+      margin-bottom: 5px !important;
+    }
+    .table td, .table th {
+      padding: 8px;
+      text-align: center;
+    }
+    .lab-session, .break-session, .unavailable, .theory-session {
+      padding: 8px;
+      margin-bottom: 3px;
+    }
+    .lab-session {
+      background-color: yellow;
+      font-weight: bold;
+      color: black;
+      border: 2px solid #ffcc00;
+    }
+    .break-session {
+      background-color: #d9534f;
+      color: white;
+      font-weight: bold;
+    }
+    .unavailable {
+      background-color: #f8f9fa;
+      color: gray;
+    }
+    .theory-session {
+      background-color: #5bc0de;
+      color: black;
+      font-weight: bold;
+    }
+    .btn-container {
+      text-align: left; /* Align button to the left */
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="full-content">
+    <h1 class="text-left">Generated Timetable</h1>
+
+    <div class="info-container">
+      <div class="alert alert-info" id="timetable-info">
+        <strong>Faculty:</strong> <span id="faculty">{{ faculty }}</span> |  
+        <strong>Semester:</strong> <span id="semester">{{ semester }}</span>
+      </div>
+    </div>
+
+    <!-- Download Button -->
+    <div class="btn-container">
+      <button id="downloadBtn" class="btn btn-success">Download Timetable as PDF</button>
+    </div>
+
+    <div class="table-container">
+      <table class="table table-bordered">
+        <thead class="thead-dark">
+          <tr>
+            <th>Day</th>
+            {% for period in periods %}
+              <th>{{ period }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for day_schedule in timetable['Timetable'] %}
+            <tr>
+              <td><strong>{{ day_schedule['Day'] }}</strong></td>
+              {% for slot in day_schedule['Slots'] %}
+                  <td class="{% if slot.get('is_break') %} break-session
+                  {% elif slot.get('Lab_Classes') %} lab-session
+                  {% elif slot.get('Subject') %} theory-session
+                  {% else %} Library Hours {% endif %}">
+                      
+                      {% if slot.get('is_break') %}
+                          <strong>BREAK</strong>
+                      
+                          {% elif 'Lab_Sessions' in slot and slot['Lab_Sessions'] %}
+                          {% for lab in slot['Lab_Sessions'] %}
+                              <div class="lab-session p-1">
+                                  <strong>{{ subject_names.get(lab.get('Subject', ''), lab.get('Subject', 'Unknown')) }}</strong><br>
+                                  <small>{{ lab.get('Teacher', 'Unknown') }}</small><br>
+                              </div>
+                              {% if not loop.last %}<hr>{% endif %}
+                          {% endfor %}
+                      
+                      {% elif slot.get('Subject') %}
+                          <div class="theory-session p-1">
+                              <strong>{{ subject_names.get(slot.get('Subject', ''), slot.get('Subject', 'Unknown')) }}</strong><br>
+                              <small>{{ slot.get('Teacher', 'TBA') }}</small>
+                          </div>
+                      
+                      {% else %}
+                          Library Hours
+                      {% endif %}
+                  </td>
+
+              
+              {% endfor %}
+            </tr>
+            <tr style="height: 15px; background-color: white;"></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("downloadBtn").addEventListener("click", function () {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({
+        orientation: "landscape",
+        unit: "px",
+        format: "a4"
+      });
+
+      const faculty = document.getElementById("faculty").innerText;
+      const semester = document.getElementById("semester").innerText;
+
+      // Capture full timetable with no missing content
+      html2canvas(document.getElementById("full-content"), {
+        scale: 2,
+        useCORS: true
+      }).then(canvas => {
+        const imgData = canvas.toDataURL("image/png");
+        const imgWidth = doc.internal.pageSize.getWidth() - 40;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        if (imgHeight > doc.internal.pageSize.getHeight() - 50) {
+          doc.internal.pageSize.height = imgHeight + 50;
+        }
+
+        doc.addImage(imgData, "PNG", 20, 40, imgWidth, imgHeight);
+        doc.save(`Timetable_Faculty_${faculty}_Semester_${semester}.pdf`);
+      });
+    });
+
+    // Adjust info-container width dynamically to match table width
+    function adjustInfoWidth() {
+      const tableWidth = document.querySelector(".table").offsetWidth;
+      document.querySelector(".alert-info").style.width = tableWidth + "px";
+    }
+
+    window.onload = adjustInfoWidth;
+    window.onresize = adjustInfoWidth;
+  </script>
+</body>
+</html>

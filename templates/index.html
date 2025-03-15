@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>EduSync</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Course Project">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/bootstrap4/bootstrap.min.css') }}">
+    <link href="{{ url_for('static', filename='plugins/fontawesome-free-5.0.1/css/fontawesome-all.css') }}" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='plugins/OwlCarousel2-2.2.1/owl.carousel.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='plugins/OwlCarousel2-2.2.1/owl.theme.default.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='plugins/OwlCarousel2-2.2.1/animate.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/main_styles.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/responsive.css') }}">
+</head>
+
+<body>
+    <div class="super_container">
+        <!-- Header --> 
+
+        <header class="header d-flex flex-row">
+            <div class="header_content d-flex flex-row align-items-center">
+                <!-- Logo -->
+                <div class="logo_container">
+                    <div class="logo">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="">
+                        <span>EduSync</span>
+                    </div>
+                </div>
+
+                <!-- Main Navigation -->
+                <nav class="main_nav_container">
+                    <div class="main_nav">
+                        <ul class="main_nav_list">
+                            <li class="main_nav_item"><a href="#">home</a></li>
+                            <li class="main_nav_item"><a href="routines.html">routines</a></li>
+                            <li class="main_nav_item"><a href="about.html">about us</a></li>
+                            <li class="main_nav_item"><a href="contact.html">contact</a></li>
+                            
+                            
+                            
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+            <div class="header_side d-flex flex-row justify-content-center align-items-center">
+                <li class="main_nav_item" style="background-color: black; padding: 10px; border-radius: 5px;">
+                    <a href="/login" style="color: white; text-decoration: none; padding: 5px;"
+                        onmouseover="this.style.color='yellow';" 
+                        onmouseout="this.style.color='white';">Login</a> |
+                    <a href="/signup" style="color: white; text-decoration: none; padding: 5px;"
+                        onmouseover="this.style.color='yellow';" 
+                        onmouseout="this.style.color='white';">Signup</a>
+                </li>
+            </div>
+
+            <!-- Hamburger -->
+            <div class="hamburger_container">
+                <i class="fas fa-bars trans_200"></i>
+            </div>
+        </header>
+
+        <!-- Menu -->
+        <div class="menu_container menu_mm">
+            <!-- Menu Close Button -->
+            <div class="menu_close_container">
+                <div class="menu_close"></div>
+            </div>
+
+            <!-- Menu Items -->
+            <div class="menu_inner menu_mm">
+                <div class="menu menu_mm">
+                    <ul class="menu_list menu_mm">
+                        <li class="menu_item menu_mm"><a href="#">Home</a></li>
+                        <li class="menu_item menu_mm"><a href="routines.html">Routines</a></li>
+                        <li class="menu_item menu_mm"><a href="#">About us</a></li>
+                        <li class="menu_item menu_mm"><a href="contact.html">Contact</a></li>
+                    </ul>
+
+                    <!-- Menu Social -->
+                    <div class="menu_social_container menu_mm">
+                        <ul class="menu_social menu_mm">
+                            <li class="menu_social_item menu_mm"><a href="#"><i class="fab fa-pinterest"></i></a></li>
+                            <li class="menu_social_item menu_mm"><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
+                            <li class="menu_social_item menu_mm"><a href="#"><i class="fab fa-instagram"></i></a></li>
+                            <li class="menu_social_item menu_mm"><a href="#"><i class="fab fa-facebook-f"></i></a></li>
+                            <li class="menu_social_item menu_mm"><a href="#"><i class="fab fa-twitter"></i></a></li>
+                        </ul>
+                    </div>
+                    <div class="menu_copyright menu_mm"> All rights reserved</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Home -->
+        <div class="home">
+
+            <!-- Hero Slider -->
+            <div class="hero_slider_container">
+                <div class="hero_slider owl-carousel">
+
+                    <!-- Hero Slide -->
+                    <div class="hero_slide">
+                        <div class="hero_slide_background" style="background-image: url('/static/images/slider_background.jpg.webp');"></div>
+
+                        <div class="hero_slide_container d-flex flex-column align-items-center justify-content-center">
+                            <div class="hero_slide_content text-center">
+                                <h1 data-animation-in="fadeInUp" data-animation-out="animate-out fadeOut">Simplify <span>Your</span> Schedule</h1>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hero Slide -->
+                    <div class="hero_slide">
+                        <div class="hero_slide_background" style="background-image: url('/static/images/slider_background.jpg.webp');"></div>
+                        <div class="hero_slide_container d-flex flex-column align-items-center justify-content-center">
+                            <div class="hero_slide_content text-center">
+                                <h1 data-animation-in="fadeInUp" data-animation-out="animate-out fadeOut">Efficiency <span>Meets</span> Intelligence</h1>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hero Slide -->
+                    <div class="hero_slide">
+                        <div class="hero_slide_background" style="background-image: url('/static/images/slider_background.jpg.webp');"></div>
+                        <div class="hero_slide_container d-flex flex-column align-items-center justify-content-center">
+                            <div class="hero_slide_content text-center">
+                                <h1 data-animation-in="fadeInUp" data-animation-out="animate-out fadeOut">Seamless <span>Routine</span> Automation</h1>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="hero_slider_left hero_slider_nav trans_200"><span class="trans_200">prev</span></div>
+                <div class="hero_slider_right hero_slider_nav trans_200"><span class="trans_200">next</span></div>
+            </div>
+
+        </div>
+
+        <!-- Register -->
+        <div class="register">
+            <div class="container-fluid">
+                <div class="row row-eq-height">
+                    <div class="col-lg-6 nopadding">
+
+                        <!-- Register -->
+                        <div class="register_section d-flex flex-column align-items-center justify-content-center">
+                            <div class="register_content text-center">
+                                <h1 class="register_title">Your Perfect Schedule, Just a <span>Click</span> Away</h1>
+                                <p class="register_text">Automate your semester scheduling effortlessly with our intelligent system. Create faculty and semester-specific timetables in just a click, and focus on learning while we handle the logistics.</p>
+                                <div class="button button_1 register_button mx-auto trans_200"><a href="/input">Generate Routine</a></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 nopadding">
+
+                        <!-- Search -->
+                        <div class="search_section d-flex flex-column align-items-center justify-content-center">
+                            <div class="hero_slide_background" style="background-image: url('/static/images/search_background.jpg.webp');"></div>
+                            <div class="search_content text-center">
+                                <h1 class="search_title">Search for your generated routine</h1>
+                                <form id="search_form" class="search_form" action="post">
+                                    <input id="search_form_name" class="input_field search_form_name" type="text" placeholder="Faculty" required="required" data-error="Faculty is required.">
+                                    <input id="search_form_category" class="input_field search_form_category" type="text" placeholder="Semester">
+                                    <button id="search_submit_button" type="submit" class="search_submit_button trans_200" value="Submit">search routine</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+<!-- Services --> 
+<div class="services page_section">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <div class="section_title text-center">
+                    <h1>Our Services</h1>
+                </div>
+            </div>
+        </div>
+
+        <div class="row services_row">
+            <div class="col-lg-4 service_item text-left d-flex flex-column align-items-start justify-content-start">
+                <div class="icon_container d-flex flex-column justify-content-end">
+                    <img src="{{ url_for('static', filename='images/earth-globe.svg') }}" alt="">
+                </div>
+                <h3>Automated Timetable Generation</h3>
+                <p>Create optimized class schedules for various faculties and semesters with minimal human intervention.</p>
+            </div>
+
+            <div class="col-lg-4 service_item text-left d-flex flex-column align-items-start justify-content-start">
+                <div class="icon_container d-flex flex-column justify-content-end">
+                    <img src="{{ url_for('static', filename='images/exam.svg') }}" alt="">
+                </div>
+                <h3>Faculty & Semester-Specific Scheduling</h3>
+                <p>Generate timetables customized for different departments, semesters, and course structures.</p>
+            </div>
+
+            <div class="col-lg-4 service_item text-left d-flex flex-column align-items-start justify-content-start">
+                <div class="icon_container d-flex flex-column justify-content-end">
+                    <img src="{{ url_for('static', filename='images/books.svg') }}" alt="">
+                </div>
+                <h3>Teacher Availability Management</h3>
+                <p>Automatically adjust schedules based on teacher availability, ensuring no conflicts or over-scheduling.</p>
+            </div>
+
+            <div class="col-lg-4 service_item text-left d-flex flex-column align-items-start justify-content-start">
+                <div class="icon_container d-flex flex-column justify-content-end">
+                    <img src="{{ url_for('static', filename='images/professor.svg') }}" alt="">
+                </div>
+                <h3>Workload Distribution Optimization</h3>
+                <p>Balance teacher workloads effectively, preventing excessive hours or uneven distribution.</p>
+            </div>
+
+            <div class="col-lg-4 service_item text-left d-flex flex-column align-items-start justify-content-start">
+                <div class="icon_container d-flex flex-column justify-content-end">
+                    <img src="{{ url_for('static', filename='images/blackboard.svg') }}" alt="">
+                </div>
+                <h3>Constraint-Based Scheduling</h3>
+                <p>Incorporate multiple constraints like subject prerequisites, teacher preferences, and department policies to create the most suitable timetable.</p>
+            </div>
+
+            <div class="col-lg-4 service_item text-left d-flex flex-column align-items-start justify-content-start">
+                <div class="icon_container d-flex flex-column justify-content-end">
+                    <img src="{{ url_for('static', filename='images/mortarboard.svg') }}" alt="">
+                </div>
+                <h3>User-Friendly Interface</h3>
+                <p>An intuitive and responsive web-based interface for administrators and faculty members to access schedules effortlessly.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+
+        <!-- Newsletter -->
+        <div class="newsletter">
+            <div class="row">
+                <div class="col">
+                    <div class="section_title text-center">
+                        <h1>Send us message</h1>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col text-center">
+                    <div class="newsletter_form_container mx-auto">
+                        <form action="{{ url_for('send_message') }}" method="POST">
+                            <div class="newsletter_form d-flex flex-column align-items-center justify-content-center">
+                                <input id="newsletter_email" name="email" class="newsletter_email" type="email" placeholder="Email Address" required="required" data-error="Valid email is required.">
+                                <textarea id="message" name="message" class="message" placeholder="Message" required="required"></textarea>
+                                <button id="newsletter_submit" type="submit" class="newsletter_submit_btn trans_300" value="Submit">Send</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Content -->
+        <div class="footer_content">
+            <div class="row">
+                <!-- Footer Column - About -->
+                 <!-- Footer Column - About -->
+
+
+                <!-- Footer Column - Menu -->
+                <div class="col-lg-3 footer_col">
+                    <div class="footer_column_title">Menu</div>
+                    <div class="footer_column_content">
+                        <ul>
+                            <li class="footer_list_item"><a href="#">Home</a></li>
+                            <li class="footer_list_item"><a href="routines.html">Routines</a></li>
+                            <li class="footer_list_item"><a href="courses.html">About Us</a></li>
+                            <li class="footer_list_item"><a href="contact.html">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Footer Column - Contact -->
+                <div class="col-lg-3 footer_col">
+                    <div class="footer_column_title">Contact</div>
+                    <div class="footer_column_content">
+                        <ul>
+                            <li class="footer_contact_item">
+                                <div class="footer_contact_icon">
+                                    <img src="{{ url_for('static', filename='images/placeholder.svg') }}" alt="https://www.flaticon.com/authors/lucy-g">
+                                </div>
+                                Talchikhel, Lalitpur
+                            </li>
+                            <li class="footer_contact_item">
+                                <div class="footer_contact_icon">
+                                    <img src="{{ url_for('static', filename='images/smartphone.svg') }}" alt="https://www.flaticon.com/authors/lucy-g">
+                                </div>
+                                +977 9846758149
+                            </li>
+                            <li class="footer_contact_item">
+                                <div class="footer_contact_icon">
+                                    <img src="{{ url_for('static', filename='images/envelope.svg') }}" alt="https://www.flaticon.com/authors/lucy-g">
+                                </div><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="5c34393030331c3f33312c3d3225723f3331">[email&#160;protected]</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                
+<!-- Footer Column - About -->
+                <div class="col-lg-6 footer_col footer_about_col"> <!-- Added class footer_about_col -->
+    <!-- Logo -->
+                    <div class="logo_container">
+                        <div class="logo">
+                            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="">
+                            <span>About us</span>
+                        </div>
+                    </div>
+
+                    <p class="footer_about_text">We develop intelligent solutions for educational institutions. Our Automatic Routine Generator using Machine Learning automates timetable creation, optimizing schedules while reducing human error and improving overall administrative efficiency.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Copyright -->
+        <div class="footer_bar d-flex flex-column flex-sm-row align-items-center">
+            <div class="footer_copyright">
+                <span><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+Copyright &copy;<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Bibek Aryal</a>
+<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></span>
+            </div>
+            <div class="footer_social ml-sm-auto">
+                <ul class="menu_social">
+                    <li class="menu_social_item"><a href="#"><i class="fab fa-pinterest"></i></a></li>
+                    <li class="menu_social_item"><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
+                    <li class="menu_social_item"><a href="#"><i class="fab fa-instagram"></i></a></li>
+                    <li class="menu_social_item"><a href="#"><i class="fab fa-facebook-f"></i></a></li>
+                    <li class="menu_social_item"><a href="#"><i class="fab fa-twitter"></i></a></li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+</footer>
+
+
+</div>
+
+<script src="{{ url_for('static', filename='js/jquery-3.2.1.min.js') }}"></script>
+<script src="{{ url_for('static', filename='styles/bootstrap4/popper.js') }}"></script>
+<script src="{{ url_for('static', filename='styles/bootstrap4/bootstrap.min.js') }}"></script>
+<script src="{{ url_for('static', filename='plugins/greensock/TweenMax.min.js') }}"></script>
+<script src="{{ url_for('static', filename='plugins/greensock/TimelineMax.min.js') }}"></script>
+<script src="{{ url_for('static', filename='plugins/scrollmagic/ScrollMagic.min.js') }}"></script>
+<script src="{{ url_for('static', filename='plugins/greensock/animation.gsap.min.js') }}"></script>
+<script src="{{ url_for('static', filename='plugins/greensock/ScrollToPlugin.min.js') }}"></script>
+<script src="{{ url_for('static', filename='plugins/OwlCarousel2-2.2.1/owl.carousel.js') }}"></script>
+<script src="{{ url_for('static', filename='plugins/scrollTo/jquery.scrollTo.min.js') }}"></script>
+<script src="{{ url_for('static', filename='plugins/easing/easing.js') }}"></script>
+<script src="{{ url_for('static', filename='js/custom.js') }}"></script>
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-23581568-13"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-23581568-13');
+</script>
+
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"rayId":"8d71b7b068a00d87","serverTiming":{"name":{"cfExtPri":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}},"version":"2024.10.3","token":"cd0b4b3a733644fc843ef0b185f98241"}' crossorigin="anonymous"></script>
+</body>
+</html>

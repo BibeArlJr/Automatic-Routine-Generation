@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Responsive Registration Form</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='signup.css') }}">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    /* Add the following styles for buttons and validation messages */
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      background-color: #007bff; /* Primary color */
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3; /* Darker shade on hover */
+      transform: translateY(-2px);
+    }
+
+    #verifyCodeBtn {
+      background-color: #28a745; /* Green color */
+    }
+
+    #verifyCodeBtn:hover {
+      background-color: #218838; /* Darker green on hover */
+    }
+
+    .validation-message {
+      color: red;
+      font-size: 12px;
+    }
+
+    .valid {
+      color: green;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="title">Registration</div>
+    <div class="content">
+      <form action="{{ url_for('signup') }}" method="post" enctype="multipart/form-data" id="signupForm">
+        <div class="user-details">
+          <div class="input-box">
+            <span class="details">Full Name</span>
+            <input type="text" name="full_name" placeholder="Enter your name" required pattern="[A-Za-z\s]+">
+            <div class="validation-message" id="nameValidation"></div>
+          </div>
+   
+          <div class="input-box">
+            <span class="details">Contact Number</span>
+            <input type="text" id="phone" name="contact_number" placeholder="Enter your number" required pattern="\d+">
+            <div class="validation-message" id="phoneValidation"></div>
+          </div>
+
+          <div class="input-box">
+            <span class="details">Email</span>
+            <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            <button type="button" id="sendCodeBtn" onclick="sendVerificationCode()">Send Verification Code</button>
+            <div class="validation-message" id="emailValidation"></div>
+          </div>
+
+          <div class="input-box">
+            <span class="details">Enter Verification Code</span>
+            <input type="text" id="verificationCode" name="verification_code" placeholder="Enter the verification code" required>
+            <button type="button" id="verifyCodeBtn" onclick="verifyCode()">Verify Code</button>
+            <div class="validation-message" id="verificationValidation"></div>
+          </div>
+
+          <div class="input-box">
+            <span class="details">Role</span>
+            <select name="role" required>
+              <option value="Admin">Admin</option>
+              <option value="HOD">HOD</option>
+              <option value="DHOD">DHOD</option>
+            </select>
+          </div>
+
+          <div class="input-box" id="facultyBox" style="display: none;">
+            <span class="details">Faculty</span>
+            <select name="faculty" required>
+                <option value="" disabled selected>Select your faculty</option>
+                <option value="Civil">Civil</option>
+                <option value="Computer">Computer</option>
+                <option value="Electrical">Electrical</option>
+                <option value="Electronics">Electronics</option>
+            </select>
+        </div>
+        
+
+          <div class="input-box">
+            <span class="details">Username</span>
+            <input type="text" name="username" placeholder="Enter your username" required>
+          </div>
+
+          <div class="input-box">
+            <span class="details">Password</span>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+          </div>
+
+          <div class="input-box">
+            <span class="details">Confirm Password</span>
+            <input type="password" id="confirmPassword" name="confirm_password" placeholder="Confirm your password" required>
+            <div class="validation-message" id="passwordValidation"></div>
+          </div>
+        </div>
+
+        <div class="gender-details">
+          <input type="radio" name="gender" id="dot-1" value="Male" required>
+          <input type="radio" name="gender" id="dot-2" value="Female">
+          <input type="radio" name="gender" id="dot-3" value="Prefer not to say">
+          <span class="gender-title">Gender</span>
+          <div class="category">
+            <label for="dot-1">
+              <span class="dot one"></span>
+              <span class="gender">Male</span>
+            </label>
+            <label for="dot-2">
+              <span class="dot two"></span>
+              <span class="gender">Female</span>
+            </label>
+            <label for="dot-3">
+              <span class="dot three"></span>
+              <span class="gender">Prefer not to say</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="button">
+          <input type="submit" value="Register" id="submitBtn" disabled>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- JavaScript to handle phone verification and input validation -->
+  <script>
+    let isVerified = false;
+
+function sendVerificationCode() {
+  const email = document.getElementById('email').value;
+
+  if (!email) {
+    alert('Please enter a valid email!');
+    return;
+  }
+
+  fetch('/send_code', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email }),
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert('Verification code sent to your email!');
+    } else {
+      alert('Failed to send verification code.');
+    }
+  })
+  .catch(error => {
+    console.error('Error sending verification code:', error);
+    alert('Error sending verification code');
+  });
+}
+
+function verifyCode() {
+  const code = document.getElementById('verificationCode').value;
+  const email = document.getElementById('email').value;
+
+  if (!code) {
+    alert('Please enter the verification code');
+    return;
+  }
+
+  fetch('/verify_code', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email, code: code }),
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert('Email verified!');
+      document.getElementById('submitBtn').disabled = false;
+      document.getElementById('verificationValidation').innerHTML = "&#10004; Verified";
+      isVerified = true;
+    } else {
+      alert('Invalid verification code.');
+      document.getElementById('verificationValidation').innerHTML = "Invalid code";
+    }
+  })
+  .catch(error => {
+    console.error('Error verifying code:', error);
+    alert('Error verifying code');
+  });
+}
+
+    // Validate password match and other fields
+    document.getElementById('signupForm').addEventListener('input', function() {
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+  
+      if (password !== confirmPassword) {
+        document.getElementById('passwordValidation').innerText = "Passwords do not match.";
+        document.getElementById('submitBtn').disabled = true;
+      } else {
+        document.getElementById('passwordValidation').innerText = "Passwords match.";
+        document.getElementById('submitBtn').disabled = !isVerified;
+      }
+    });
+  
+    // Validation on form submit
+    document.getElementById('signupForm').addEventListener('submit', function(event) {
+      let isValid = true;
+  
+      // Loop through each required field
+      this.querySelectorAll('input[required], select[required]').forEach(function(input) {
+        if (!input.value) {
+          input.nextElementSibling.innerHTML = "Please fill out this field"; // Display validation message
+          isValid = false;
+        } else {
+          input.nextElementSibling.innerHTML = ""; // Clear validation message
+        }
+      });
+  
+      // Prevent form submission if any field is invalid
+      if (!isValid) {
+        event.preventDefault();
+      }
+    });
+
+
+     // Show Faculty dropdown if role is HOD or DHOD
+  document.querySelector('select[name="role"]').addEventListener('change', function() {
+    const facultyBox = document.getElementById('facultyBox');
+    facultyBox.style.display = (this.value === 'HOD' || this.value === 'DHOD') ? 'block' : 'none';
+  });
+
+
+  // Show Faculty dropdown if role is HOD or DHOD
+document.querySelector('select[name="role"]').addEventListener('change', function() {
+    const facultyBox = document.getElementById('facultyBox');
+    facultyBox.style.display = (this.value === 'HOD' || this.value === 'DHOD') ? 'block' : 'none';
+});
+
+// Function to retain the faculty dropdown state
+function retainFacultyDropdown() {
+    const roleSelect = document.querySelector('select[name="role"]');
+    const facultyBox = document.getElementById('facultyBox');
+    if (roleSelect.value === 'HOD' || roleSelect.value === 'DHOD') {
+        facultyBox.style.display = 'block';
+    } else {
+        facultyBox.style.display = 'none';
+    }
+}
+
+// Call the retainFacultyDropdown function on page load
+document.addEventListener('DOMContentLoaded', retainFacultyDropdown);
+
+  </script>
+  
+</body>
+</html>

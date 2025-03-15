@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timetable Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='input.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='sidebar.css') }}">
+ 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* Add styles for buttons and validation messages */
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            background-color: #007bff;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .validation-message {
+            color: red;
+            font-size: 12px;
+        }
+
+        .valid {
+            color: green;
+            font-size: 12px;
+        }
+
+        /* Main Content */
+        .container {
+            margin-left: 190px;
+            padding: 20px;
+            width: calc(100% - 190px);
+            transition: margin-left 0.3s ease;
+        }
+
+    </style>
+</head>
+<body>
+    {% include 'sidebar.html' %}
+
+    <div class="container">
+        <div class="title">TimeTable Generation</div>
+        <div class="content">
+            <form method="POST" action="/generate_timetable" class="mt-4">
+                <div class="user-details">
+                    <div class="input-box">
+                        <span class="details">Select Faculty</span>
+                        <select class="form-control" name="faculty" id="faculty" required>
+                            <option value="">Choose...</option>
+                            {% for faculty in faculties %}
+                            <option value="{{ faculty }}">{{ faculty }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+    
+                    <div class="input-box">
+                        <span class="details">Select Semester</span>
+                        <select class="form-control" name="semester" id="semester" required>
+                            <option value="">Choose...</option>
+                            {% for semester in semesters %}
+                            <option value="{{ semester }}">{{ semester }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+    
+                    <div class="input-box">
+                        <span class="details">Days per Week</span>
+                        <input type="number" name="days" id="days" class="form-control" required min="1" max="7">
+                    </div>
+    
+                    <!-- Dynamic Holiday Section -->
+                    
+                    <div id="holiday-section"></div>
+                
+    
+                    <div class="input-box">
+                        <span class="details">Start Time</span>
+                        <input type="time" name="start" class="form-control" required>
+                    </div>
+    
+                    <div class="input-box">
+                        <span class="details">End Time</span>
+                        <input type="time" name="end" class="form-control" required>
+                    </div>
+    
+                    <div class="input-box">
+                        <span class="details">Period Length (minutes)</span>
+                        <input type="number" name="period_length" class="form-control" required min="1">
+                    </div>
+    
+                    <div class="input-box">
+                        <span class="details">Break Length (minutes)</span>
+                        <input type="number" name="break_length" class="form-control" required min="0">
+                    </div>
+                </div>
+       
+                <div id="elective-container">
+                    <!-- Elective dropdowns will be added here dynamically -->
+                </div>
+          
+
+                </select>
+            </div>
+
+                <div class="button">
+                    <button type="submit" class="btn btn-primary">Generate Timetable</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Dynamic Holiday Section
+        document.getElementById('days').addEventListener('change', function () {
+    let daysPerWeek = parseInt(this.value);
+    let holidaySection = document.getElementById('holiday-section');
+    holidaySection.innerHTML = ''; // Clear previous holidays
+
+    if (daysPerWeek >= 7) return; // No holidays if all 7 days are working
+
+    let holidaysNeeded = 7 - daysPerWeek;
+    let weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    let selectedHolidays = new Set(); // To track selected holidays
+
+    for (let i = 0; i < holidaysNeeded; i++) {
+        let label = document.createElement('label');
+        label.textContent = `Holiday ${i + 1}: `;
+        label.classList.add('holiday-label');
+
+        let select = document.createElement('select');
+        select.classList.add('form-control', 'holiday-dropdown');
+        select.name = 'holidays[]';
+
+        // Populate dropdown with available weekdays
+        weekdays.forEach(day => {
+            let option = document.createElement('option');
+            option.value = day;
+            option.textContent = day;
+            select.appendChild(option);
+        });
+
+        // Handle change event for holiday dropdown
+        select.addEventListener('change', function () {
+            let currentSelection = this.value;
+            
+            // Remove previously selected holiday from the set
+            selectedHolidays.delete(this.dataset.previousValue);
+            // Add new selection to the set
+            selectedHolidays.add(currentSelection);
+            // Store the current selection
+            this.dataset.previousValue = currentSelection;
+
+            // Update all holiday dropdowns to exclude already selected holidays
+            document.querySelectorAll('.holiday-dropdown').forEach(dropdown => {
+                let currentSelected = dropdown.value;
+                dropdown.innerHTML = ''; // Clear existing options
+
+                weekdays.forEach(day => {
+                    if (!selectedHolidays.has(day) || day === currentSelected) {
+                        let option = document.createElement('option');
+                        option.value = day;
+                        option.textContent = day;
+                        dropdown.appendChild(option);
+                    }
+                });
+
+                // Restore the currently selected value
+                dropdown.value = currentSelected;
+            });
+        });
+
+        // Store initial selection value
+        select.dataset.previousValue = select.value;
+        selectedHolidays.add(select.value);
+
+        holidaySection.appendChild(label);
+        holidaySection.appendChild(select);
+        holidaySection.appendChild(document.createElement('br'));
+    }
+});
+
+document.getElementById("semester").addEventListener("change", function () {
+    let faculty = document.getElementById("faculty").value;
+    let semester = this.value;
+    let electiveContainer = document.getElementById("elective-container");
+    electiveContainer.innerHTML = "";  // Clear previous dropdowns and buttons
+
+    if (faculty && semester) {
+        fetch(`/get_subjects?faculty=${faculty}&semester=${semester}`)
+            .then(response => response.json())
+            .then(data => {
+                let electiveSubjects = data.filter(subject => subject.Name.includes("Elective"));
+
+                if (electiveSubjects.length > 0) {
+                    electiveSubjects.forEach(subject => {
+                        // Create input-box div
+                        let electiveGroup = document.createElement("div");
+                        electiveGroup.classList.add("input-box");
+
+                        // Create the label
+                        let label = document.createElement("span");
+                        label.classList.add("details");
+                        label.style.paddingTop = "10px";
+                        label.textContent = `Select ${subject.Name}:`;
+
+                        // Create the dropdown
+                        let electiveDropdown = document.createElement("select");
+                        electiveDropdown.classList.add("form-control"); // Apply the same class as other inputs
+                        electiveDropdown.id = subject.Name.replace(/\s+/g, "-").toLowerCase();
+                        electiveDropdown.style.height = "40px";  // Adjust height to match the button
+
+                        // Sort and add courses as options
+                        subject.Courses.sort((a, b) => a.Name.localeCompare(b.Name));
+                        subject.Courses.forEach(course => {
+                            let option = document.createElement("option");
+                            option.value = course.Code;
+                            option.textContent = course.Name;
+                            electiveDropdown.appendChild(option);
+                        });
+
+                        // Create the "Add Elective" button
+                        let addElectiveButton = document.createElement("button");
+                        addElectiveButton.classList.add("btn", "btn-primary");
+                        addElectiveButton.style.marginTop = 0;
+                        addElectiveButton.style.marginLeft = "8px";
+                        addElectiveButton.textContent = "Add Elective";
+
+                        // Array to hold selected elective courses
+                        let selectedCourses = [];
+
+                        addElectiveButton.addEventListener("click", function () {
+                            let selectedOption = electiveDropdown.options[electiveDropdown.selectedIndex];
+                            if (selectedOption && !selectedCourses.includes(selectedOption.value)) {
+                                selectedCourses.push(selectedOption.value);
+                                // Display the added course
+                                let selectedCourseText = document.createElement("div");
+                                selectedCourseText.classList.add("selected-course");
+                                selectedCourseText.textContent = selectedOption.textContent;
+
+                                // Create Remove button for the selected course
+                                let removeButton = document.createElement("button");
+                                removeButton.classList.add("btn", "btn-danger");
+                                removeButton.textContent = "Remove";
+
+                                // When Remove button is clicked
+                                removeButton.addEventListener("click", function () {
+                                    // Remove the course from the list
+                                    selectedCourseText.remove();
+                                    selectedCourses = selectedCourses.filter(courseCode => courseCode !== selectedOption.value);
+
+                                    // Re-enable the option in the dropdown
+                                    electiveDropdown.querySelector(`option[value="${selectedOption.value}"]`).disabled = false;
+                                });
+
+                                // Append the Remove button to the selected course div
+                                selectedCourseText.appendChild(removeButton);
+
+                                // Add the selected course to the list
+                                electiveGroup.appendChild(selectedCourseText);
+
+                                // Disable the selected option in the dropdown
+                                selectedOption.disabled = true;
+                            }
+                        });
+
+                        // Create a wrapper div for the dropdown and button (they will be on the same row)
+                        let dropdownWrapper = document.createElement("div");
+                        dropdownWrapper.style.display = "flex"; // Use flexbox to align items in a row
+                        dropdownWrapper.style.alignItems = "center"; // Center-align vertically
+                        dropdownWrapper.style.marginBottom = "10px"; // Optional: add space between rows
+
+                        // Append the dropdown and button to the wrapper
+                        dropdownWrapper.appendChild(electiveDropdown);
+                        dropdownWrapper.appendChild(addElectiveButton);
+
+                        // Append the label in a separate row above the dropdown and button
+                        electiveGroup.appendChild(label);
+                        electiveGroup.appendChild(dropdownWrapper);
+
+                        // Append to the container
+                        electiveContainer.appendChild(electiveGroup);
+                    });
+                } else {
+                    let noElectives = document.createElement("p");
+                    noElectives.textContent = "No elective subjects available for this semester.";
+                    electiveContainer.appendChild(noElectives);
+                }
+            })
+            .catch(error => console.error("Error fetching elective subjects:", error));
+    }
+});
+
+    </script>
+</body>
+</html>

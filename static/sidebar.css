@@ -1,0 +1,90 @@
+/* static/css/sidebar.css */
+
+/* Sidebar Styles */
+.sidebar {
+    width: 205px;
+    background-color: #000000;
+    color: #fff;
+    position: fixed; /* Fixed position for the sidebar */
+    height: 100%;
+    padding-top: 10px;
+    transition: width 0.3s ease;
+    top: 0; /* Ensure it sticks to the top */
+    left: 0; /* Align to the left */
+}
+
+/* Add a margin to the content container */
+.container {
+    margin-left: 210px; /* Match the width of the sidebar */
+    padding: 20px; /* Add some padding */
+    /* Optional: add a min-height to ensure content takes up the full height */
+    min-height: 100vh; /* Ensure it fills the height */
+}
+
+
+.sidebar .profile {
+    text-align: center;
+    padding: 20px 0;
+    border-bottom: 1px solid #444;
+}
+
+.sidebar .profile h3 {
+    margin: 0;
+    font-size: 1.2em;
+}
+
+.sidebar .profile p {
+    font-size: 0.9em;
+    color: #aaa;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.sidebar ul li {
+    padding: 15px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background 0.3s ease;
+}
+
+.sidebar ul li:hover {
+    background-color: #444;
+}
+
+.sidebar ul li a {
+    color: #fff;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+.sidebar ul li a i {
+    margin-right: 10px;
+}
+
+/* Logout Button */
+.sidebar .logout {
+    position: absolute;
+    bottom: 70px; /* Adjust as needed */
+    width: calc(100% - 40px); /* Center the button */
+    padding: 15px;
+    text-align: center;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.sidebar .logout:hover {
+    background-color: #555;
+}
+
+/* Responsive Sidebar */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 60px;
+    }
+}

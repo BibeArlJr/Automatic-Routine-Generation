@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Teacher</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='sidebar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='add_teacher.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap">
+    <style>
+        .availability-inputs {
+            display: none; /* Hidden by default */
+            margin-top: 10px;
+        }
+        .availability-row {
+            margin-bottom: 5px;
+        }
+        .add-button {
+            margin-top: 5px;
+            cursor: pointer;
+            color: #007bff;
+            text-decoration: underline;
+        }
+        button {
+            padding: 5px 10px;
+            border: none;
+            background-color: #dc3545;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .remove-button {
+    background-color: #e74c3c; /* Red color for removal action */
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+}
+
+.remove-button:hover {
+    background-color: #c0392b; /* Darker red for hover */
+}
+
+.remove-button:active {
+    background-color: #a93226; /* Even darker red for click effect */
+}
+
+.availability-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.availability-row select,
+.availability-row input {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.remove-button {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+}
+
+.remove-button:hover {
+    background-color: #c0392b;
+}
+
+.remove-button:active {
+    background-color: #a93226;
+}
+
+.availability-row select {
+            height: 40px; /* Adjust as needed for the desired height */
+            padding: 5px;
+            font-size: 16px; /* Optional: increases font size for readability */
+        }
+
+        .container {
+            max-height: 80vh; /* Adjust height as needed */
+            overflow-y: auto;
+            padding: 20px;
+        }
+    </style>
+    <script>
+        function toggleAvailability() {
+            const teacherType = document.getElementById('teacherType').value;
+            document.getElementById('availabilityInputs').style.display = teacherType === 'Part Time' ? 'block' : 'none';
+        }
+
+        function toggleCustomInput() {
+            const designationSelect = document.getElementById('designationSelect');
+            const customDesignationInput = document.getElementById('customDesignationInput');
+            customDesignationInput.style.display = designationSelect.value === 'Custom' ? 'block' : 'none';
+            customDesignationInput.required = designationSelect.value === 'Custom';
+        }
+
+        function prepareFormForSubmission() {
+            // Handle custom designation value if "Custom" is selected
+            const designationSelect = document.getElementById('designationSelect');
+    const customDesignationInput = document.getElementById('customDesignationInput');
+    const designationField = document.getElementById('designationField');
+
+    // If 'Custom' is selected, use the custom input as the designation value
+    if (designationSelect.value === 'Custom') {
+        designationField.value = customDesignationInput.value;  // Set hidden input value
+    } else {
+        designationField.value = designationSelect.value;  // Set selected value
+    }
+
+            // Sort availability days in order of Sunday to Saturday before submission
+            const dayOrder = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            const availabilityRows = Array.from(document.querySelectorAll(".availability-row"));
+            availabilityRows.sort((a, b) => {
+                const dayA = a.querySelector("select[name='availability[day][]']").value;
+                const dayB = b.querySelector("select[name='availability[day][]']").value;
+                return dayOrder.indexOf(dayA) - dayOrder.indexOf(dayB);
+            });
+
+            // Reorder rows in the DOM based on the sorted order
+            const availabilityContainer = document.getElementById('availabilityInputs');
+            availabilityRows.forEach(row => availabilityContainer.appendChild(row));
+            customDesignationInput.value = designationSelect.value === 'Custom' ? customDesignationInput.value : designationSelect.value;
+
+        }
+
+        function addAvailabilityRow() {
+            const container = document.getElementById('availabilityInputs');
+            const newRow = document.createElement('div');
+            newRow.className = 'availability-row';
+            newRow.innerHTML = `
+                <select name="availability[day][]" required>
+                    <option value="" disabled selected>Select a day</option>
+                    <option value="Sunday">Sunday</option>
+                    <option value="Monday">Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday">Thursday</option>
+                    <option value="Friday">Friday</option>
+                    <option value="Saturday">Saturday</option>
+                </select>
+                <input type="text" name="availability[time][]" placeholder="Time: e.g., '07:00-10:00, 13:00-14:00'" required>
+                <span class="remove-button" onclick="removeAvailabilityRow(this)">Remove</span>
+            `;
+            container.appendChild(newRow);
+        }
+
+        function removeAvailabilityRow(element) {
+            element.parentElement.remove();
+        }
+
+        function addCourseCodeField() {
+            const container = document.getElementById('courseCodeContainer');
+            const newRow = document.createElement('div');
+            newRow.className = 'course-code-row';
+            newRow.innerHTML = `
+                <input type="text" name="course_code[]" placeholder="Course Code" required>
+                <span class="remove-button" onclick="removeCourseCodeField(this)">Remove</span>
+            `;
+            container.appendChild(newRow);
+        }
+
+        function removeCourseCodeField(button) {
+            button.parentElement.remove();
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            toggleAvailability();
+            toggleCustomInput();
+        });
+    </script>
+</head>
+<body>
+    {% include 'sidebar.html' %}
+
+    <div class="container">
+        <h1 class="title">Edit Teacher</h1>
+        {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+            <div class="mt-2">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} text-center">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    
+        <div class="content">
+            <form action="{{ url_for('edit_teacher', teacher_id=teacher['_id']) }}" method="post" novalidate onsubmit="prepareFormForSubmission()">
+                <div class="user-details">
+                    <div class="input-box">
+                <span class="details" for="name">Name:</span>
+                <input type="text" name="name" id="name" value="{{ teacher['name'] }}" required>
+</div>
+
+        <div class="input-box">
+                <span class="details" for="designation">Designation:</span>
+                <select name="designation" id="designationSelect" onchange="toggleCustomInput()">
+                    <option value="" disabled>Select Designation</option>
+                    <option value="CEO" {{ 'selected' if teacher['designation'] == 'CEO' else '' }}>CEO</option>
+                    <option value="Principal" {{ 'selected' if teacher['designation'] == 'Principal' else '' }}>Principal</option>
+                    <option value="Vice Principal" {{ 'selected' if teacher['designation'] == 'Vice Principal' else '' }}>Vice Principal</option>
+                    <option value="HOD" {{ 'selected' if teacher['designation'] == 'HOD' else '' }}>HOD</option>
+                    <option value="DHOD" {{ 'selected' if teacher['designation'] == 'DHOD' else '' }}>DHOD</option>
+                    <option value="Teacher" {{ 'selected' if teacher['designation'] == 'Teacher' else '' }}>Teacher</option>
+                    <option value="Custom" {{ 'selected' if teacher['designation'] not in ['CEO', 'Principal', 'Vice Principal', 'HOD', 'DHOD', 'Teacher'] else '' }}>Custom</option>
+                </select>
+                <input type="text" name="custom_designation" id="customDesignationInput" placeholder="Enter custom designation" value="{{ teacher['designation'] if teacher['designation'] not in ['CEO', 'Principal', 'Vice Principal', 'HOD', 'DHOD', 'Teacher'] else '' }}" style="display: none;">
+        </div>
+
+        <div class="input-box">
+                <span class="details" for="teacherType">Type:</span>
+                <select name="type" id="teacherType" onchange="toggleAvailability()">
+                    <option value="Full Time" {{ 'selected' if teacher['type'] == 'Full Time' else '' }}>Full Time</option>
+                    <option value="Part Time" {{ 'selected' if teacher['type'] == 'Part Time' else '' }}>Part Time</option>
+                </select>
+        </div>
+
+        <div class="input-box">
+                <span class="details" for="course_codes">Course Codes:</span>
+                <div id="courseCodeContainer">
+                    {% for code in teacher['Course_Code'] %}
+                        <div class="course-code-row">
+                            <input type="text" name="course_code[]" value="{{ code }}" placeholder="Course Code" required>
+                            <span class="remove-button" onclick="removeCourseCodeField(this)">Remove</span>
+                        </div>
+                    {% endfor %}
+                </div>
+                <button type="button" onclick="addCourseCodeField()">Add Course</button>
+        </div>
+
+        <div class="input-box">
+                <div id="availabilityInputs" class="availability-inputs">
+    <span class="details">Availability:</span>
+                    {% if teacher['type'] == 'Part Time' and teacher['availability'] %}
+                        {% for day, times in teacher['availability'].items() %}
+                            {% for time in times %}
+                                <div class="availability-row">
+                                    <select name="availability[day][]">
+                                        <option value="Sunday" {{ 'selected' if day == 'Sunday' else '' }}>Sunday</option>
+                                        <option value="Monday" {{ 'selected' if day == 'Monday' else '' }}>Monday</option>
+                                        <option value="Tuesday" {{ 'selected' if day == 'Tuesday' else '' }}>Tuesday</option>
+                                        <option value="Wednesday" {{ 'selected' if day == 'Wednesday' else '' }}>Wednesday</option>
+                                        <option value="Thursday" {{ 'selected' if day == 'Thursday' else '' }}>Thursday</option>
+                                        <option value="Friday" {{ 'selected' if day == 'Friday' else '' }}>Friday</option>
+                                        <option value="Saturday" {{ 'selected' if day == 'Saturday' else '' }}>Saturday</option>
+                                    </select>
+                                    <input type="text" name="availability[time][]" value="{{ time }}" placeholder="Time: e.g., '07:00-10:00, 13:00-14:00'" required>
+                                    <span class="remove-button" onclick="removeAvailabilityRow(this)">Remove</span>
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+                    {% endif %}
+                    <button type="button" class="btn-add-course" onclick="addAvailabilityRow()">Add Availability</button>
+                </div>
+        </div>
+                </div>
+
+                <div class="button">
+                    <input type="submit" value="Save Change">
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

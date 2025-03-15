@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Teachers</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='sidebar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='manage_teachers.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script>
+        function confirmDelete(teacher_id) {
+            if (confirm("Are you sure you want to delete this user?")) {
+                const deleteUrl = "{{ url_for('delete_teacher', teacher_id='') }}" + teacher_id;
+                window.location.href = deleteUrl;
+            }
+        }
+         // Add event listeners to each button
+    document.querySelectorAll('.filter-button').forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove 'active' class from all buttons
+            document.querySelectorAll('.filter-button').forEach(btn => btn.classList.remove('active'));
+            // Add 'active' class to the clicked button
+            this.classList.add('active');
+        });
+    });
+    </script>
+
+<style>
+
+.faculty-info {
+    margin-top: 10px;
+    font-size: 18px;
+    color: #6b6d68;
+}
+
+    .wrap {
+        display: flex; /* Align buttons horizontally */
+        align-items: center; /* Center align items vertically */
+        gap: 1px; /* Space between elements */
+    }
+
+    .configuration {
+        font-size: 20px; /* Font size for the configuration label */
+        margin-right: 1px; /* Space between the label and buttons */
+    }
+
+    .filter-button {
+        padding: 10px 20px; /* Adjust button size with padding */
+        font-size: 16px; /* Set font size */
+        border: none; /* Remove default border */
+        border-radius: 5px; /* Rounded corners */
+        cursor: pointer; /* Change cursor on hover */
+        background-color: #686a6d; /* Default background color */
+        color: #f2f7f2; /* Default text color */
+        transition: background-color 0.3s ease; /* Smooth background color transition */
+    }
+
+    .filter-button.active {
+        background-color: #16863d; /* Background color when active */
+        color: white; /* Text color when active */
+    }
+
+    .filter-button:hover {
+        background-color: #e0e0e0; /* Change background color on hover */
+    }
+    
+        /* Main Content */
+        .container {
+            margin-left: 190px;
+            padding: 20px;
+            width: calc(100% - 190px);
+            transition: margin-left 0.3s ease;
+        }
+
+</style>
+
+</head>
+<body>
+         <!-- Sidebar Include -->
+         {% include 'sidebar.html' %}
+
+    <div class="container">
+        <h1>Manage Teachers</h1>
+        <!-- Buttons for Part-Time and Full-Time selection -->
+        <div class="header">
+            <div class="wrap" role="group" aria-label="toggle">
+                <span class="configuration"><b>Teacher:</b></span>
+                <button id="fullTimeButton" class="filter-button active" onclick="showFullTime()">FULL</button>
+                <button id="partTimeButton" class="filter-button" onclick="showPartTime()">PART</button>
+            </div>
+            
+            <a href="{{ url_for('add_teacher_page') }}" class="add-teacher-button">Add Teacher</a>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search Teachers..." />
+                <button id="searchButton">Search</button>
+            </div>        
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+            <div class="flash-messages mt-3">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} flash-message">
+                        <span class="message-text">{{ message }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}  
+
+        {% if user_role in ['HOD', 'DHOD'] %}
+            <div class="faculty-info">Faculty: {{ faculty_name }}</div>
+        {% endif %} 
+        
+<!-- Full-Time Teachers Table -->
+        <div id="fullTimeTable" class="teacher-table">
+        <h2>Full-Time Teachers</h2>
+        <table class="user-table">
+        <thead>
+            <tr>
+                <th>SN</th>
+                <th>Name</th>
+                <th>Designation</th>
+                <th>Subject</th>
+                <th>Workload</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="fullTimeTeacherTable">
+            {% if full_time_teachers %}
+                {% for teacher in full_time_teachers %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ teacher.name }}</td>
+                    <td>{{ teacher.designation }}</td>
+                    <td>{{ teacher.Course_Code | join(', ') }}</td>
+                    <td>{{ teacher.Workload if teacher.Workload else 0 }}</td> 
+                    <td class="actions">
+                        <a href="{{ url_for('edit_teacher', teacher_id=teacher._id) }}" class="btn edit">Edit</a>
+                        <button onclick="confirmDelete('{{ teacher._id }}')" class="btn delete">Delete</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="5">No full-time teachers found.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+
+<!-- Part-Time Teachers Table with Availability -->
+<div id="partTimeTable" class="teacher-table" style="display: none;">
+    <h2>Part-Time Teachers</h2>
+    <table class="user-table">
+        <thead>
+            <tr>
+                <th>SN</th>
+                <th>Name</th>
+                <th>Designation</th>
+                <th>Subject</th>
+                <th>Workload</th>
+                <th>Availability</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="partTimeTeacherTable">
+            {% if part_time_teachers %}
+            {% for teacher in part_time_teachers %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ teacher.name }}</td>
+                <td>{{ teacher.designation }}</td>
+                <td>{{ teacher.Course_Code | join(', ') }}</td>
+                <td>{{ teacher.Workload if teacher.Workload else 0 }}</td>  
+                <td>
+                    <ul>
+                        {% if teacher.availability %}
+                            {% for day in teacher.availability %}
+                                <li>{{ day }}: {{ teacher.availability[day] | join(', ') }}</li>
+                            {% endfor %}
+                        {% else %}
+                            <li>No availability data</li>
+                        {% endif %}
+                    </ul>
+                </td>
+                <td class="actions">
+                    <a href="{{ url_for('edit_teacher', teacher_id=teacher._id) }}" class="btn edit">Edit</a>
+                    <button onclick="confirmDelete('{{ teacher._id }}')" class="btn delete">Delete</button>
+                </td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="6">No part-time teachers found.</td>
+            </tr>
+        {% endif %}
+        </tbody>
+    </table>
+</div>
+</div>
+    </div>
+
+    <script>
+   
+        // Auto-hide flash messages after 5 seconds
+        setTimeout(() => {
+        const flashMessages = document.querySelectorAll('.flash-message');
+        flashMessages.forEach(message => {
+            message.style.display = 'none';
+        });
+    }, 5000);
+    
+     // Toggle active state for buttons and show relevant tables on page load
+     document.addEventListener('DOMContentLoaded', function () {
+            showFullTime();  // Default to Full Time view
+        });
+
+        // Toggle 'active' class on filter buttons when clicked
+        document.querySelectorAll('.filter-button').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.filter-button').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Show Full Time table and hide Part Time table
+        function showFullTime() {
+            event.preventDefault();
+            document.getElementById('fullTimeTable').style.display = 'block';
+            document.getElementById('partTimeTable').style.display = 'none';
+            document.getElementById('fullTimeButton').classList.add('active');
+            document.getElementById('partTimeButton').classList.remove('active');
+        }
+
+        // Show Part Time table and hide Full Time table
+        function showPartTime() {
+            event.preventDefault();
+            document.getElementById('partTimeTable').style.display = 'block';
+            document.getElementById('fullTimeTable').style.display = 'none';
+            document.getElementById('partTimeButton').classList.add('active');
+            document.getElementById('fullTimeButton').classList.remove('active');
+        }
+        // Search function to filter both Full-Time and Part-Time tables
+        document.getElementById('searchButton').onclick = function() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const activeTable = document.getElementById('fullTimeTable').style.display === 'block' ? 'fullTimeTeacherTable' : 'partTimeTeacherTable';
+            const rows = document.querySelectorAll(`#${activeTable} tr`);
+            let found = false;
+
+            rows.forEach(row => {
+                const cells = row.getElementsByTagName('td');
+                let match = false;
+
+                for (let cell of cells) {
+                    if (cell.innerText.toLowerCase().includes(input)) {
+                        match = true;
+                        break;
+                    }
+                }
+
+                row.style.display = match ? '' : 'none';
+                if (match) found = true;
+            });
+
+            const noResultsRow = document.getElementById('no-results-row');
+            if (!found && !noResultsRow) {
+                const teacherTable = document.getElementById(activeTable);
+                const newRow = document.createElement('tr');
+                newRow.id = 'no-results-row';
+                newRow.innerHTML = `<td colspan="6" class="no-results">No matching records found.</td>`;
+                teacherTable.appendChild(newRow);
+            } else if (found && noResultsRow) {
+                noResultsRow.remove();
+            }
+        };
+
+    </script>
+</body>
+</html>

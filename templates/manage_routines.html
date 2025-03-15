@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Routines</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='manage_routines.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='sidebar.css') }}">
+ 
+    
+    <style>
+        .flash-messages {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.flash-message {
+    max-width: 90%;
+    width: 600px;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1rem;
+    text-align: center;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border-left: 4px solid #28a745;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-left: 4px solid #dc3545;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border-left: 4px solid #ffc107;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border-left: 4px solid #17a2b8;
+}
+
+        .btn-add {
+            background-color: #28a745;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .btn-add:hover {
+            background-color: #218838;
+        }
+        .toggle-icon {
+            cursor: pointer;
+            font-weight: bold;
+            padding-right: 10px;
+        }
+        .nested-table {
+            display: none;
+            margin-left: 20px;
+        }
+
+
+    </style>
+    <script>
+       
+        // JavaScript confirmation dialog for delete
+  function confirmDelete() {
+    return confirm("Are you sure you want to delete the routine?");
+  }
+
+     </script>
+</head>
+<body>
+
+       <!-- Sidebar Include -->
+       {% include 'sidebar.html' %}
+
+       
+    <div class="container">
+        <h1>Manage Timetables</h1>
+        <div class="header">
+            <a href="{{ url_for('index') }}" class="btn btn-add">Generate Routine</a>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search Routine..."/>
+                <button id="searchButton">Search</button>
+            </div>       
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+            <div class="flash-messages mt-3">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} flash-message">
+                        <span class="message-text">{{ message }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}    
+
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>SN</th>
+                    <th>Faculty</th>
+                    <th>Semester</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for routine in routines %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ routine['Faculty'] }}</td>
+                        <td>{{ routine['Semester'] }}</td>
+                        <td>
+                            <!-- Read Button (View Timetable) -->
+                            <a href="{{ url_for('view_timetable', faculty=routine['Faculty'], semester=routine['Semester']) }}" class="btn btn-info">Read</a>
+                            
+                            <!-- Delete Button -->
+                            <a href="{{ url_for('delete_routine', faculty=routine.Faculty, semester=routine.Semester) }}" 
+           class="btn btn-danger" onclick="return confirmDelete();">Delete</a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center">No generated routines available.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <a href="/" class="btn btn-primary mt-3">Back to Home</a>
+    </div>
+</body>
+</html>

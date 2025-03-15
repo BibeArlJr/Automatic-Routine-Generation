@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit User</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='sidebar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='edit_user.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">    
+</head>
+<body>
+   <!-- Sidebar Include -->
+   {% include 'sidebar.html' %}
+
+<div class="container">
+    <div class="title">Edit User</div>
+    <div class="scrollable-content"> <!-- Scrollable wrapper -->
+    <form action="{{ url_for('edit_user', user_id=user['_id']) }}" method="POST" id="editUserForm">
+        <div class="user-details">
+            <div class="input-box">
+                <span class="details">Full Name</span>
+                <input type="text" id="full_name" name="full_name" value="{{ user['full_name'] }}" required>
+            </div>
+
+            <div class="input-box">
+                <span class="details">Contact Number</span>
+                <input type="text" id="contact_number" name="contact_number" value="{{ user['contact_number'] }}" required>
+            </div>
+
+            <div class="input-box">
+                <span class="details">Email</span>
+                <input type="email" id="email" name="email" value="{{ user['email'] }}" required>
+            </div>
+
+            <div class="input-box">
+                <span class="details">Username</span>
+                <input type="text" id="username" name="username" value="{{ user['username'] }}" required>
+            </div>
+
+            <div class="input-box">
+                <span class="details">Gender</span>
+                <select id="gender" name="gender">
+                    <option value="Male" {% if user['gender'] == 'Male' %}selected{% endif %}>Male</option>
+                    <option value="Female" {% if user['gender'] == 'Female' %}selected{% endif %}>Female</option>
+                    <option value="Other" {% if user['gender'] == 'Other' %}selected{% endif %}>Other</option>
+                </select>
+            </div>
+
+            <div class="input-box">
+                <span class="details">Role</span>
+                <select id="role" name="role">
+                    <option value="Admin" {% if user['role'] == 'Admin' %}selected{% endif %}>Admin</option>
+                    <option value="HOD" {% if user['role'] == 'HOD' %}selected{% endif %}>HOD</option>
+                    <option value="DHOD" {% if user['role'] == 'DHOD' %}selected{% endif %}>DHOD</option>
+                </select>
+            </div>
+
+            <div class="input-box" id="facultyBox" {% if user['role'] not in ['HOD', 'DHOD'] %}style="display: none;"{% endif %}>
+                <span class="details">Faculty</span>
+                <select id="faculty" name="faculty">
+                    <option value="Civil" {% if user['faculty'] == 'Civil' %}selected{% endif %}>Civil</option>
+                    <option value="Computer" {% if user['faculty'] == 'Computer' %}selected{% endif %}>Computer</option>
+                    <option value="Electrical" {% if user['faculty'] == 'Electrical' %}selected{% endif %}>Electrical</option>
+                    <option value="Electronics" {% if user['faculty'] == 'Electronics' %}selected{% endif %}>Electronics</option>
+                </select>
+            </div>
+
+        </div>
+
+        <div class="button">
+            <input type="submit" value="Save Changes">
+        </div>
+    </form>
+</div>
+</div>
+<script>
+    document.getElementById('role').addEventListener('change', function() {
+        document.getElementById('facultyBox').style.display = (this.value === 'HOD' || this.value === 'DHOD') ? 'block' : 'none';
+    });
+</script>
+
+</body>
+</html>

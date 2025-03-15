@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab Schedule</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='manage_subjects.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='sidebar.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <style>
+        .container {
+            margin-left: 190px;
+            padding: 20px;
+            width: calc(100% - 190px);
+            transition: margin-left 0.3s ease;
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .user-table {
+            width: 100%;
+            table-layout: auto;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px 12px;
+            text-align: left;
+            border: 1px solid #dee2e6;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        }
+
+        #searchInput {
+            width: 50%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        #searchButton {
+            height: 37px;
+            padding: 10px 15px;
+            margin-left: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #searchButton:hover {
+            background-color: #0056b3;
+        }
+
+        /* Ensure better alignment of teachers */
+        .teacher-column {
+            display: flex;
+            flex-direction: column;
+        }
+
+#tableContainer th:nth-child(1), td:nth-child(1) { /* SN */
+    width: 4%;
+}
+
+#tableContainer th:nth-child(2) { /* subjcet Name */
+    width: 30%;
+    word-wrap: break-word; /* Allows long names to break within the cell */
+}
+
+#tableContainer th:nth-child(3), td:nth-child(3) { /* lab room */
+    width: 13%;
+}
+
+#tableContainer th:nth-child(4), td:nth-child(4) { /* teacher 1 */
+    width: 13%;
+}
+
+#tableContainer th:nth-child(5), td:nth-child(5) { /* teacher 2 */
+    width: 13%;
+}
+
+#tableContainer th:nth-child(6), td:nth-child(6) { /* day */
+    width: 10%;
+}
+
+#tableContainer th:nth-child(7), td:nth-child(7) { /* time slot */
+    width: 15%;
+}
+
+    </style>
+</head>
+<body>
+
+    {% include 'sidebar.html' %}
+
+    <div class="container">
+        <h1>Lab Schedule</h1>
+
+        <!-- Search & Filter Section -->
+        <div class="header">
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search Lab Details..."/>
+                <button id="searchButton">Search</button>
+            </div>
+        </div>
+
+        <!-- Lab Details Table -->
+        <div id = "tableContainer" class="table-container">
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>SN</th>
+                        <th>Subject Name</th>
+                        <th>Lab Room</th>
+                        <th>Teacher 1</th>
+                        <th>Teacher 2</th>
+                        <th>Day</th>
+                        <th>Time Slot</th>
+                    </tr>
+                </thead>
+                <tbody id="labDetailsTable">
+                    {% if lab_details %}
+                        {% for lab in lab_details %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ lab.Subject_Name }}</td>
+                            <td>{{ lab.Lab_Room }}</td>
+                            
+                            <!-- Ensure teacher details are properly formatted -->
+                            <td class="teacher-column">
+                                {{ lab.Teacher_1.name if lab.Teacher_1 else 'Not Assigned' }}
+                                <br>
+                                <small>({{ lab.Teacher_1.designation if lab.Teacher_1 else 'N/A' }})</small>
+                            </td>
+                            <td class="teacher-column">
+                                {{ lab.Teacher_2.name if lab.Teacher_2 else 'Not Assigned' }}
+                                <br>
+                                <small>({{ lab.Teacher_2.designation if lab.Teacher_2 else 'N/A' }})</small>
+                            </td>
+
+                            <td>{{ lab.Day }}</td>
+                            <td>{{ lab.Time_Slot }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center">No Lab Details Available.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("searchButton").onclick = function () {
+            const input = document.getElementById("searchInput").value.toLowerCase();
+            const rows = document.querySelectorAll("#labDetailsTable tr");
+            let found = false;
+
+            rows.forEach(row => {
+                const cells = row.getElementsByTagName("td");
+                let match = false;
+
+                for (let cell of cells) {
+                    if (cell.innerText.toLowerCase().includes(input)) {
+                        match = true;
+                        found = true;
+                        break;
+                    }
+                }
+
+                row.style.display = match ? "" : "none";
+            });
+
+            // Show "No matching records found" if no subjects match the search term
+            const noResultsRow = document.getElementById("no-results-row");
+            if (!found && !noResultsRow) {
+                const subjectTable = document.getElementById("labDetailsTable");
+                const newRow = document.createElement("tr");
+                newRow.id = "no-results-row";
+                newRow.innerHTML = `<td colspan="8" class="text-center">No matching records found.</td>`;
+                subjectTable.appendChild(newRow);
+            } else if (found && noResultsRow) {
+                noResultsRow.remove();
+            }
+        };
+    </script>
+
+</body>
+</html>

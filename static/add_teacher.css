@@ -1,0 +1,209 @@
+/* Importing Google Fonts - Poppins */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    background: linear-gradient(135deg, #71b7e6, #9b59b6);
+}
+.container {
+    max-width: calc(100% - 190px); /* Adjust width to account for the sidebar */
+    width: 100%;
+    background-color: #fff;
+    padding: 25px 30px;
+    margin-top: 10px;
+    border-radius: 5px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.container .title {
+    font-size: 25px;
+    font-weight: 500;
+    text-align: center;
+    position: relative;
+}
+
+.container .title::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 0;
+    height: 3px;
+    width: 30px;
+    border-radius: 5px;
+    background: linear-gradient(135deg, #71b7e6, #9b59b6);
+}
+
+.content {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.content::-webkit-scrollbar {
+    width: 5px;
+}
+
+.content::-webkit-scrollbar-thumb {
+    background: #9b59b6;
+    border-radius: 10px;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-details .input-box {
+    margin-bottom: 15px;
+}
+
+.user-details .input-box span.details {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.user-details .input-box input,
+.user-details .input-box select,
+.availabilityInputs .availability-row select {
+    height: 45px;
+    width: 100%;
+    outline: none;
+    font-size: 16px;
+    border-radius: 5px;
+    padding-left: 15px;
+    border: 1px solid #ccc;
+    border-bottom-width: 2px;
+    transition: all 0.3s ease;
+}
+
+.user-details .input-box input:focus,
+.user-details .input-box select:focus {
+    border-color: #9b59b6;
+}
+
+/* Styles for availability section */
+.availability-inputs {
+    margin-top: 10px;
+}
+
+.availability-row {
+    display: flex;
+    gap: 10px;
+    /* Space between inputs */
+    margin-bottom: 10px;
+    /* Space between rows */
+}
+
+.availability-row input {
+    height: 40px;
+    /* Consistent height */
+    flex: 1;
+    /* Allow the inputs to grow */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding-left: 10px;
+    transition: border-color 0.3s ease;
+}
+
+.availability-row input:focus {
+    border-color: #9b59b6;
+    /* Focused border color */
+}
+
+/* Style for the add button */
+.add-button {
+    color: #007bff;
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: 14px;
+    /* Font size for buttons */
+}
+
+.add-button:hover {
+    color: #0056b3;
+}
+
+.button {
+    margin-top: 20px;
+}
+
+.button input {
+    height: 45px;
+    width: 100%;
+    border-radius: 5px;
+    border: none;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #71b7e6, #9b59b6);
+}
+
+.button input:hover {
+    background: linear-gradient(-135deg, #71b7e6, #9b59b6);
+}
+
+/* Responsive media query code for mobile devices */
+@media(max-width: 584px) {
+    .container {
+        max-width: 100%;
+    }
+
+    .user-details .input-box {
+        margin-bottom: 15px;
+        width: 100%;
+    }
+
+    .button input {
+        width: 100%;
+    }
+}
+
+.course-code-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.course-code-row input {
+    flex: 1;
+    margin-right: 10px;
+    /* Spacing between input and remove button */
+}
+
+.remove-button {
+    background-color: #e74c3c;
+    color: white;
+    padding: 5px 10px;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+}
+
+.remove-button:hover {
+    background-color: #c0392b;
+}
+
+.remove-button:active {
+    background-color: #a93226;
+}

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Subjects</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='manage_subjects.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='sidebar.css') }}">
+    <script>
+       
+       function confirmDelete(subject_id) {
+    if (confirm("Are you sure you want to delete this subject?")) {
+        // Redirect to the delete route with subject_id
+        window.location.href = "{{ url_for('delete_subject', subject_id='') }}" + subject_id;
+    }
+}
+    </script>
+
+    <style>
+        .flash-messages {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.flash-message {
+    max-width: 90%;
+    width: 600px;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1rem;
+    text-align: center;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border-left: 4px solid #28a745;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-left: 4px solid #dc3545;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border-left: 4px solid #ffc107;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border-left: 4px solid #17a2b8;
+}
+
+        .btn-add {
+            background-color: #28a745;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .btn-add:hover {
+            background-color: #218838;
+        }
+        .toggle-icon {
+            cursor: pointer;
+            font-weight: bold;
+            padding-right: 10px;
+        }
+        .nested-table {
+            display: none;
+            margin-left: 20px;
+        }
+
+        /* Main Content */
+        .container {
+            margin-left: 190px;
+            padding: 20px;
+            width: calc(100% - 190px);
+            transition: margin-left 0.3s ease;
+        }
+
+
+    </style>
+</head>
+<body>
+       <!-- Sidebar Include -->
+       {% include 'sidebar.html' %}
+
+    <div class="container">
+        <h1>Manage Subjects</h1>
+
+        <div class="header">
+            <a href="{{ url_for('add_subject') }}" class="btn btn-add">Add Subject</a>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search Subjects..."/>
+                <button id="searchButton">Search</button>
+            </div>       
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+            <div class="flash-messages mt-3">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} flash-message">
+                        <span class="message-text">{{ message }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}    
+
+    {% if user_role == 'Admin' %}
+        <div class="filter-container">
+
+            <label for="filterFaculty">Filter by Faculty:</label>
+            <select id="filterFaculty">
+                <option value="all">All</option>
+                <option value="Civil">Civil</option>
+                <option value="Computer">Computer</option>
+                <option value="Electrical">Electrical</option>
+                <option value="Electronics">Electronics</option>
+            </select>
+
+            <label for="filterSemester">Filter by Semester:</label>
+            <select id="filterSemester">
+                <option value="all">All</option>
+                {% for sem in range(1, 9) %}
+                    <option value="{{ sem }}">{{ sem }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endif %}
+
+
+        {% if user_role in ['HOD', 'DHOD'] %}
+        <div class="faculty-info">Faculty: {{ faculty_name if faculty_name else 'No Faculty Assigned' }}</div>
+        {% endif %}
+        
+        <div class="table-container">
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>SN</th>
+                    <th>Name</th>
+                    <th>Code</th>
+                    <th>Faculty</th>
+                    <th>Sem</th>
+                    <th>L</th> <!-- Lecture Hours -->
+                    <th>T</th> <!-- Tutorial Hours -->
+                    <th>P</th> <!-- Practical Hours -->
+                    <th>Total</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="subjectTable">
+                {% if subjects %}
+                    {% for subject in subjects %}
+                    <tr id="subject-{{ subject._id }}">
+                        <td>{{ loop.index }}</td>
+                        <td>
+                            {% if subject.Courses %}
+                                <span class="toggle-icon" onclick="toggleElective('{{ subject._id }}')">▼</span>
+                            {% endif %}
+                            {{ subject.Name }}
+                        </tyd>
+                        <td>{{ subject.Code or '-' }}</td>
+                        <td>{{ subject.Faculty }}</td>
+                        <td>{{ subject.Semester }}</td>
+                        <td>{{ subject.L }}</td> <!-- Display Lecture Hours -->
+                        <td>{{ subject.T }}</td> <!-- Display Tutorial Hours -->
+                        <td>{{ subject.P }}</td> <!-- Display Practical Hours -->
+                        <td>{{ subject.Total }}</td>
+                        <td class="actions">
+                            <a href="{{ url_for('edit_subject', object_id=subject['_id']) }}" class="btn btn-edit">Edit</a>
+                            <button onclick="confirmDelete('{{ subject._id }}')" class="btn btn-delete">Delete</button>
+                        </td>
+                    </tr>
+                    {% if subject.Courses %}
+                    <tr id="courses-{{ subject._id }}" class="nested-table">
+                        <td colspan="10">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>SN</th>
+                                        <th>Course Name</th>
+                                        <th>Course Code</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for course in subject.Courses %}
+                                    <tr>
+                                        <td>{{ loop.index }}</td>
+                                        <td>{{ course.Name }}</td>
+                                        <td>{{ course.Code }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="10">No subjects found.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+        </div>
+    </div>
+    <script>
+
+function applySearchAndFilters() {
+    const searchInput = document.getElementById('searchInput').value.toLowerCase();
+    const facultyFilter = document.getElementById('filterFaculty') ? document.getElementById('filterFaculty').value.toLowerCase() : null;
+    const semesterFilter = document.getElementById('filterSemester') ? document.getElementById('filterSemester').value : null;
+
+    const rows = document.querySelectorAll("#subjectTable tr");
+
+    let anyVisible = false; // Track if any row matches
+
+    rows.forEach(row => {
+        const isMainRow = row.id.startsWith('subject-');
+        const subjectId = row.id.replace('subject-', '');
+        const nestedRow = document.getElementById(`courses-${subjectId}`);
+
+        if (isMainRow) {
+            // Retrieve cell data for filtering
+            const name = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+            const faculty = row.querySelector('td:nth-child(4)') ? row.querySelector('td:nth-child(4)').textContent.toLowerCase() : null;
+            const semester = row.querySelector('td:nth-child(5)') ? row.querySelector('td:nth-child(5)').textContent : null;
+
+            // Check if row matches all filters
+            const matchesSearch = !searchInput || name.includes(searchInput);
+            const matchesFacultyFilter = facultyFilter === 'all' || (faculty && faculty === facultyFilter);
+            const matchesSemesterFilter = semesterFilter === 'all' || (semester && semester === semesterFilter);
+
+            const shouldDisplay = matchesSearch && 
+                (facultyFilter ? matchesFacultyFilter : true) && 
+                (semesterFilter ? matchesSemesterFilter : true);
+
+            row.style.display = shouldDisplay ? '' : 'none';
+
+            // Keep all elective rows collapsed by default
+            if (nestedRow) {
+                nestedRow.style.display = 'none';
+            }
+
+            if (shouldDisplay) anyVisible = true;
+        }
+    });
+
+    // Display "No results found" row if no subjects match
+    const noResultsRow = document.getElementById('no-results-row');
+    if (!anyVisible && !noResultsRow) {
+        const subjectTable = document.getElementById('subjectTable');
+        const newRow = document.createElement('tr');
+        newRow.id = 'no-results-row';
+        newRow.innerHTML = `<td colspan="10" class="no-results">No matching records found.</td>`;
+        subjectTable.appendChild(newRow);
+    } else if (anyVisible && noResultsRow) {
+        noResultsRow.remove();
+    }
+}
+
+// Attach event listeners
+document.getElementById('searchButton').addEventListener('click', applySearchAndFilters);
+if (document.getElementById('filterFaculty')) {
+    document.getElementById('filterFaculty').addEventListener('change', applySearchAndFilters);
+}
+if (document.getElementById('filterSemester')) {
+    document.getElementById('filterSemester').addEventListener('change', applySearchAndFilters);
+}
+
+         // Auto-hide flash messages after 5 seconds
+    setTimeout(() => {
+        const flashMessages = document.querySelectorAll('.flash-message');
+        flashMessages.forEach(message => {
+            message.style.display = 'none';
+        });
+    }, 5000);
+
+    
+    document.getElementById('searchButton').onclick = function() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll("#subjectTable tr");
+            let found = false;
+
+            rows.forEach(row => {
+                const rowId = row.id;
+                const isMainRow = rowId.startsWith('subject-');
+                const subjectId = rowId.replace('subject-', '');
+                const nestedRow = document.getElementById(`courses-${subjectId}`);
+                let match = false;
+
+                // Check if the main row contains the search term
+                if (isMainRow) {
+                    const cells = row.getElementsByTagName('td');
+                    for (let cell of cells) {
+                        if (cell.innerText.toLowerCase().includes(input)) {
+                            match = true;
+                            found = true;
+                            break;
+                        }
+                    }
+                    
+                    // Display the main row and nested row if it matches the search
+                    row.style.display = match ? '' : 'none';
+                    if (nestedRow) {
+                        nestedRow.style.display = match ? 'none' : 'none'; // Hide nested initially
+                    }
+                }
+            });
+
+            // Show "No matching records found" if no subjects match the search term
+            const noResultsRow = document.getElementById('no-results-row');
+            if (!found && !noResultsRow) {
+                const subjectTable = document.getElementById('subjectTable');
+                const newRow = document.createElement('tr');
+                newRow.id = 'no-results-row';
+                newRow.innerHTML = `<td colspan="10" class="no-results">No matching records found.</td>`;
+                subjectTable.appendChild(newRow);
+            } else if (found && noResultsRow) {
+                noResultsRow.remove();
+            }
+        };
+
+        // Toggle elective courses for each subject row
+        function toggleElective(electiveId) {
+            const electiveTable = document.getElementById(`courses-${electiveId}`);
+            if (electiveTable) {
+                electiveTable.style.display = electiveTable.style.display === 'table-row' ? 'none' : 'table-row';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterName = document.getElementById('filterName');
+            const filterFaculty = document.getElementById('filterFaculty');
+            const filterSemester = document.getElementById('filterSemester');
+
+            const applyFilters = () => {
+                const nameFilter = filterName.value.toLowerCase();
+                const facultyFilter = filterFaculty.value.toLowerCase();
+                const semesterFilter = filterSemester.value;
+
+                const rows = document.querySelectorAll("#subjectTable tr");
+
+                rows.forEach(row => {
+                    const name = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                    const faculty = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
+                    const semester = row.querySelector('td:nth-child(5)').textContent;
+
+                    let nameMatch = nameFilter === 'all' || name.includes(nameFilter);
+                    let facultyMatch = facultyFilter === 'all' || faculty === facultyFilter;
+                    let semesterMatch = semesterFilter === 'all' || semester === semesterFilter;
+
+                    row.style.display = (nameMatch && facultyMatch && semesterMatch) ? '' : 'none';
+                });
+            };
+
+            filterName.addEventListener('change', applyFilters);
+            filterFaculty.addEventListener('change', applyFilters);
+            filterSemester.addEventListener('change', applyFilters);
+        });
+    </script>
+</body>
+</html>
